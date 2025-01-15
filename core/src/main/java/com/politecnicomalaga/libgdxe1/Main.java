@@ -82,7 +82,7 @@ public class Main extends ApplicationAdapter {
                 if (iPosXClicked<fPosXPlayer) iDireccion=2; //Ibamos arriba o abajo, ahora a la izquierda
                 else iDireccion=3; //Han tocado por la derecha...
             } else {
-                if (iPosYClicked<fPosYPlayer) iDireccion=0; //Ibamos izq o derecha, ahora abajo
+                if (Gdx.graphics.getHeight()-iPosYClicked<fPosYPlayer) iDireccion=0; //Ibamos izq o derecha, ahora abajo
                 else iDireccion=1;  //vamos para arriba
             }
             if (bGanamos) {

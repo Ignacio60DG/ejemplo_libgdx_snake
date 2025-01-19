@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.politecnicomalaga.libgdxe1.modelo.Serpiente;
 
 import java.util.Random;
 
@@ -18,7 +19,7 @@ import java.util.Random;
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch; //Es la clase que representa una pantalla donde se pueden pintar imágenes
     private Texture image;  //Esta es una instancia/objeto imagen
-    private Texture player;
+    //private Texture player;
     private Texture endImage;
     //Aquí ponemos todas las Texture que necesitemos ahora mismo en el videojuego
     //Además todas las variables (son realmente atributos de Main) que necesitemos
@@ -28,9 +29,10 @@ public class Main extends ApplicationAdapter {
     private float iPosXImagen;
     private float iPosYImagen;
 
-    private float fPosXPlayer;
-    private float fPosYPlayer;
+    //private float fPosXPlayer;
+    //private float fPosYPlayer;
     private float fVelPlayer;
+    private Serpiente serpiente;
 
     private int iDireccion;  //0 para arriba, 1 para abajo, 2 para izquierda, 3 para derecha
     private boolean bGanamos;
@@ -43,16 +45,18 @@ public class Main extends ApplicationAdapter {
          */
         batch = new SpriteBatch();
         image = new Texture("mouse.png");
-        player = new Texture("player.png");
+        //player = new Texture("player.png");
         endImage = new Texture("end.png");
         iDireccion =0;
         iPosXImagen=200;
         iPosYImagen=200;
 
-        fPosXPlayer=300;
-        fPosYPlayer=300;
+        //fPosXPlayer=300;
+        //fPosYPlayer=300;
         fVelPlayer=0.5f;
         bGanamos = false;
+
+        serpiente = new Serpiente(300, 300, new Texture("player.png"));
     }
 
     @Override
@@ -79,10 +83,10 @@ public class Main extends ApplicationAdapter {
             iPosYClicked = Gdx.input.getY();
 
             if (iDireccion==0 || iDireccion ==1) {
-                if (iPosXClicked<fPosXPlayer) iDireccion=2; //Ibamos arriba o abajo, ahora a la izquierda
+                if (iPosXClicked<serpiente.getXPlayer()) iDireccion=2; //Ibamos arriba o abajo, ahora a la izquierda
                 else iDireccion=3; //Han tocado por la derecha...
             } else {
-                if (Gdx.graphics.getHeight()-iPosYClicked<fPosYPlayer) iDireccion=0; //Ibamos izq o derecha, ahora abajo
+                if (Gdx.graphics.getHeight()-iPosYClicked<serpiente.getYPlayer()) iDireccion=0; //Ibamos izq o derecha, ahora abajo
                 else iDireccion=1;  //vamos para arriba
             }
             if (bGanamos) {
@@ -90,8 +94,9 @@ public class Main extends ApplicationAdapter {
                 iPosXImagen=200;
                 iPosYImagen=200;
 
-                fPosXPlayer=300;
-                fPosYPlayer=300;
+                serpiente.setXPlayer(300);
+                serpiente.setYPlayer(300);
+
                 fVelPlayer=0.5f;
                 bGanamos = false;
             }
@@ -104,23 +109,27 @@ public class Main extends ApplicationAdapter {
         if (!bGanamos) {
             switch (iDireccion) {
                 case 0: //arriba
-                    fPosYPlayer+=fVelPlayer;
+                    serpiente.setYPlayer(serpiente.getYPlayer() + fVelPlayer);
+                    //fPosYPlayer+=fVelPlayer;
                     break;
                 case 1: //abajo
-                    fPosYPlayer-=fVelPlayer;
+                    serpiente.setYPlayer(serpiente.getYPlayer() - fVelPlayer);
+                    //fPosYPlayer-=fVelPlayer;
                     break;
                 case 2: //izquierda
-                    fPosXPlayer-=fVelPlayer;
+                    serpiente.setXPlayer(serpiente.getXPlayer() - fVelPlayer);
+                    //fPosXPlayer-=fVelPlayer;
                     break;
                 case 3:
-                    fPosXPlayer+=fVelPlayer;
+                    serpiente.setXPlayer(serpiente.getXPlayer() + fVelPlayer);
+                   //fPosXPlayer+=fVelPlayer;
                     break;
             }
             //Evitamos que se salga
-            if (fPosXPlayer>Gdx.graphics.getWidth()-image.getWidth()) fPosXPlayer = Gdx.graphics.getWidth()-image.getWidth();
-            if (fPosYPlayer>Gdx.graphics.getHeight()-image.getWidth()) fPosYPlayer = Gdx.graphics.getHeight()-image.getWidth();
-            if (fPosXPlayer<0) fPosXPlayer = 0;
-            if (fPosYPlayer<0) fPosYPlayer = 0;
+            if (serpiente.getXPlayer()>Gdx.graphics.getWidth()-image.getWidth()) serpiente.setXPlayer(Gdx.graphics.getWidth()-image.getWidth());
+            if (serpiente.getYPlayer()>Gdx.graphics.getHeight()-image.getWidth()) serpiente.setYPlayer(Gdx.graphics.getHeight()-image.getWidth());
+            if (serpiente.getXPlayer()<0) serpiente.setXPlayer(0);
+            if (serpiente.getYPlayer()<0) serpiente.setYPlayer(0);
         }
 
         //También simulamos el "cambio" o "salto" de la imagen a perseguir
@@ -136,7 +145,7 @@ public class Main extends ApplicationAdapter {
         //------------------------------
 
         //Si han colisionado, hemos ganado
-        if (colisionan(iPosXImagen,iPosYImagen,fPosXPlayer,fPosYPlayer, image.getWidth())) {
+        if (colisionan(iPosXImagen,iPosYImagen,serpiente.getXPlayer(),serpiente.getYPlayer(), image.getWidth())) {
             //ganamos
             bGanamos = true;
 
@@ -160,7 +169,7 @@ public class Main extends ApplicationAdapter {
             batch.draw(endImage, 80, 0);
         } else {
             batch.draw(image, iPosXImagen, iPosYImagen);
-            batch.draw(player, fPosXPlayer, fPosYPlayer);
+            batch.draw(serpiente.getPlayerTexture(), serpiente.getXPlayer(), serpiente.getYPlayer());
         }
 
         batch.end();
@@ -170,7 +179,7 @@ public class Main extends ApplicationAdapter {
     public void dispose() {
         batch.dispose();
         image.dispose();
-        player.dispose();
+        //player.dispose();
         endImage.dispose();
     }
 

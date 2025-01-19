@@ -18,24 +18,20 @@ import java.util.Random;
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch; //Es la clase que representa una pantalla donde se pueden pintar imágenes
-    //private Texture image;  //Esta es una instancia/objeto imagen
-    //private Texture player;
+
     private Texture endImage;
     //Aquí ponemos todas las Texture que necesitemos ahora mismo en el videojuego
     //Además todas las variables (son realmente atributos de Main) que necesitemos
     private int iPosXClicked;
     private int iPosYClicked;
 
-    //private float iPosXImagen;
-    //private float iPosYImagen;
-
-    //private float fPosXPlayer;
-    //private float fPosYPlayer;
     private float fVelPlayer;
     private Serpiente serpiente;
 
     private int iDireccion;  //0 para arriba, 1 para abajo, 2 para izquierda, 3 para derecha
     private boolean bGanamos;
+
+    private int ladoCuadrado = 10;
 
     @Override
     public void create() {
@@ -48,15 +44,10 @@ public class Main extends ApplicationAdapter {
         //player = new Texture("player.png");
         endImage = new Texture("end.png");
         iDireccion =0;
-        //iPosXImagen=200;
-        //iPosYImagen=200;
-
-        //fPosXPlayer=300;
-        //fPosYPlayer=300;
-        fVelPlayer=0.5f;
+        fVelPlayer=10f;
         bGanamos = false;
 
-        serpiente = new Serpiente(300, 300, new Texture("player.png"));
+        serpiente = new Serpiente(300, 300, new Texture("player.png"), ladoCuadrado);
     }
 
     @Override
@@ -89,18 +80,6 @@ public class Main extends ApplicationAdapter {
                 if (Gdx.graphics.getHeight()-iPosYClicked<serpiente.getYPlayer()) iDireccion=0; //Ibamos izq o derecha, ahora abajo
                 else iDireccion=1;  //vamos para arriba
             }
-            /*
-            if (bGanamos) {
-                iDireccion =0;
-                iPosXImagen=200;
-                iPosYImagen=200;
-
-                serpiente.setXPlayer(300);
-                serpiente.setYPlayer(300);
-
-                fVelPlayer=0.5f;
-                bGanamos = false;
-            }*/
         }
 
         //------------------------------
@@ -128,33 +107,11 @@ public class Main extends ApplicationAdapter {
             }
             //Evitamos que se salga
             // DE momento hemos puesto 50 el ancho de la imagen, mover esto a constante
-            if (serpiente.getXPlayer()>Gdx.graphics.getWidth()-50) serpiente.setXPlayer(Gdx.graphics.getWidth()-50);
-            if (serpiente.getYPlayer()>Gdx.graphics.getHeight()-50) serpiente.setYPlayer(Gdx.graphics.getHeight()-50);
+            if (serpiente.getXPlayer()>Gdx.graphics.getWidth()-ladoCuadrado) serpiente.setXPlayer(Gdx.graphics.getWidth()-ladoCuadrado);
+            if (serpiente.getYPlayer()>Gdx.graphics.getHeight()-ladoCuadrado) serpiente.setYPlayer(Gdx.graphics.getHeight()-ladoCuadrado);
             if (serpiente.getXPlayer()<0) serpiente.setXPlayer(0);
             if (serpiente.getYPlayer()<0) serpiente.setYPlayer(0);
         }
-
-        //También simulamos el "cambio" o "salto" de la imagen a perseguir
-        /*
-        if (!bGanamos && Math.random()>0.999) {//0,1% de posibilidades de "saltar" en cada frame
-            Random dado = new Random();
-            iPosXImagen = dado.nextInt(Gdx.graphics.getWidth());
-            iPosYImagen = dado.nextInt(Gdx.graphics.getHeight());
-
-        }*/
-
-        //------------------------------
-        //Control de cambios
-        //------------------------------
-
-        //Si han colisionado, hemos ganado
-        /*
-        if (colisionan(iPosXImagen,iPosYImagen,serpiente.getXPlayer(),serpiente.getYPlayer(), image.getWidth())) {
-            //ganamos
-            bGanamos = true;
-
-        }*/
-
 
 
         //------------------------------
@@ -169,12 +126,10 @@ public class Main extends ApplicationAdapter {
         batch.begin();
 
         //Aquí los draw...
-        /*if(bGanamos) {
-            batch.draw(endImage, 80, 0);
-        } else {*/
-            //batch.draw(image, iPosXImagen, iPosYImagen);
-            batch.draw(serpiente.getPlayerTexture(), serpiente.getXPlayer(), serpiente.getYPlayer());
-        //}
+        //batch.draw(serpiente.getPlayerTexture(), serpiente.getXPlayer(), serpiente.getYPlayer());
+        for(int i=0; i < serpiente.getCuadrados().length; i++)    {
+            batch.draw(serpiente.getPlayerTexture(), serpiente.getCuadrados()[i].getX(), serpiente.getCuadrados()[i].getY());
+        }
 
         batch.end();
     }
@@ -182,18 +137,6 @@ public class Main extends ApplicationAdapter {
     @Override
     public void dispose() {
         batch.dispose();
-        //image.dispose();
-        //player.dispose();
         endImage.dispose();
-    }
-
-
-    //Función colisiona. Determina cuando dos rectángulos están solapados en un espacio 2D
-    public boolean colisionan(float fPosX1, float fPosY1, float fPosX2, float fPosY2, float fLado) {
-        //Lado es el ancho y alto de los cuadrados que representan al jugador y a la imagen.
-        //dos cuadrados se solapan parcial o totalmente si se solapan en el eje X y en el eje Y a la vez
-        //un solapamiento en X implica que x1 y x2 no estén más lejos que el tamaño del lado
-        //En Y, es lo mismo.
-        return (Math.abs(fPosX1-fPosX2)<fLado && Math.abs(fPosY1-fPosY2)<fLado);
     }
 }

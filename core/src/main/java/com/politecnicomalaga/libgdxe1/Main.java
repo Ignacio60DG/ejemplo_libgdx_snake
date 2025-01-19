@@ -18,7 +18,7 @@ import java.util.Random;
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch; //Es la clase que representa una pantalla donde se pueden pintar imágenes
-    private Texture image;  //Esta es una instancia/objeto imagen
+    //private Texture image;  //Esta es una instancia/objeto imagen
     //private Texture player;
     private Texture endImage;
     //Aquí ponemos todas las Texture que necesitemos ahora mismo en el videojuego
@@ -26,8 +26,8 @@ public class Main extends ApplicationAdapter {
     private int iPosXClicked;
     private int iPosYClicked;
 
-    private float iPosXImagen;
-    private float iPosYImagen;
+    //private float iPosXImagen;
+    //private float iPosYImagen;
 
     //private float fPosXPlayer;
     //private float fPosYPlayer;
@@ -44,12 +44,12 @@ public class Main extends ApplicationAdapter {
             ApplicationAdapter es el encargado de llamar a este método. Lo veremos en profundidad cuando estudiemos herencia
          */
         batch = new SpriteBatch();
-        image = new Texture("mouse.png");
+        //image = new Texture("mouse.png");
         //player = new Texture("player.png");
         endImage = new Texture("end.png");
         iDireccion =0;
-        iPosXImagen=200;
-        iPosYImagen=200;
+        //iPosXImagen=200;
+        //iPosYImagen=200;
 
         //fPosXPlayer=300;
         //fPosYPlayer=300;
@@ -89,6 +89,7 @@ public class Main extends ApplicationAdapter {
                 if (Gdx.graphics.getHeight()-iPosYClicked<serpiente.getYPlayer()) iDireccion=0; //Ibamos izq o derecha, ahora abajo
                 else iDireccion=1;  //vamos para arriba
             }
+            /*
             if (bGanamos) {
                 iDireccion =0;
                 iPosXImagen=200;
@@ -99,7 +100,7 @@ public class Main extends ApplicationAdapter {
 
                 fVelPlayer=0.5f;
                 bGanamos = false;
-            }
+            }*/
         }
 
         //------------------------------
@@ -126,30 +127,33 @@ public class Main extends ApplicationAdapter {
                     break;
             }
             //Evitamos que se salga
-            if (serpiente.getXPlayer()>Gdx.graphics.getWidth()-image.getWidth()) serpiente.setXPlayer(Gdx.graphics.getWidth()-image.getWidth());
-            if (serpiente.getYPlayer()>Gdx.graphics.getHeight()-image.getWidth()) serpiente.setYPlayer(Gdx.graphics.getHeight()-image.getWidth());
+            // DE momento hemos puesto 50 el ancho de la imagen, mover esto a constante
+            if (serpiente.getXPlayer()>Gdx.graphics.getWidth()-50) serpiente.setXPlayer(Gdx.graphics.getWidth()-50);
+            if (serpiente.getYPlayer()>Gdx.graphics.getHeight()-50) serpiente.setYPlayer(Gdx.graphics.getHeight()-50);
             if (serpiente.getXPlayer()<0) serpiente.setXPlayer(0);
             if (serpiente.getYPlayer()<0) serpiente.setYPlayer(0);
         }
 
         //También simulamos el "cambio" o "salto" de la imagen a perseguir
+        /*
         if (!bGanamos && Math.random()>0.999) {//0,1% de posibilidades de "saltar" en cada frame
             Random dado = new Random();
             iPosXImagen = dado.nextInt(Gdx.graphics.getWidth());
             iPosYImagen = dado.nextInt(Gdx.graphics.getHeight());
 
-        }
+        }*/
 
         //------------------------------
         //Control de cambios
         //------------------------------
 
         //Si han colisionado, hemos ganado
+        /*
         if (colisionan(iPosXImagen,iPosYImagen,serpiente.getXPlayer(),serpiente.getYPlayer(), image.getWidth())) {
             //ganamos
             bGanamos = true;
 
-        }
+        }*/
 
 
 
@@ -165,12 +169,12 @@ public class Main extends ApplicationAdapter {
         batch.begin();
 
         //Aquí los draw...
-        if(bGanamos) {
+        /*if(bGanamos) {
             batch.draw(endImage, 80, 0);
-        } else {
-            batch.draw(image, iPosXImagen, iPosYImagen);
+        } else {*/
+            //batch.draw(image, iPosXImagen, iPosYImagen);
             batch.draw(serpiente.getPlayerTexture(), serpiente.getXPlayer(), serpiente.getYPlayer());
-        }
+        //}
 
         batch.end();
     }
@@ -178,7 +182,7 @@ public class Main extends ApplicationAdapter {
     @Override
     public void dispose() {
         batch.dispose();
-        image.dispose();
+        //image.dispose();
         //player.dispose();
         endImage.dispose();
     }

@@ -2,18 +2,18 @@ package com.politecnicomalaga.libgdxe1;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.politecnicomalaga.libgdxe1.modelo.Direccion;
 import com.politecnicomalaga.libgdxe1.modelo.Serpiente;
-
-import java.util.Random;
 
 /*  AAR
     Esta es la clase de partida de todos los videojuegos Libgdx. Desde esta clase, que es llamada desde el lanzador
     de escritorio, de android, de html, etc... se llamarán a los demás objetos de la capa de modelo, vista o controlador
  */
+
+
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -28,10 +28,20 @@ public class Main extends ApplicationAdapter {
     private float fVelPlayer;
     private Serpiente serpiente;
 
-    private int iDireccion;  //0 para arriba, 1 para abajo, 2 para izquierda, 3 para derecha
+    private Direccion iDireccion;  //0 para arriba, 1 para abajo, 2 para izquierda, 3 para derecha
     private boolean bGanamos;
 
+    private boolean bGameOver;
+
     private int ladoCuadrado = 10;
+
+    private float tiempoDesdeUltimoMovimiento = 0;
+
+    private float tiempoDesdeUltimoEngorde = 0;
+
+    private float intervaloDeTiempoMovimiento = 0.5f;
+
+    private float intervaloDeTiempoEngorde = 5.0f;
 
     @Override
     public void create() {
@@ -43,15 +53,20 @@ public class Main extends ApplicationAdapter {
         //image = new Texture("mouse.png");
         //player = new Texture("player.png");
         endImage = new Texture("end.png");
-        iDireccion =0;
+        iDireccion = Direccion.ARRIBA;
         fVelPlayer=10f;
         bGanamos = false;
+        bGameOver = false;
 
         serpiente = new Serpiente(300, 300, new Texture("player.png"), ladoCuadrado);
     }
 
     @Override
     public void render() {
+        float delta = Gdx.graphics.getDeltaTime();
+        tiempoDesdeUltimoMovimiento += delta;
+        tiempoDesdeUltimoEngorde += delta;
+
 
         /*  AAR
             Método corazón de todos los videojuegos Libgdx
@@ -68,39 +83,49 @@ public class Main extends ApplicationAdapter {
         //Control de entrada
         //------------------------------
 
+        bGameOver = serpiente.buscaCuadrado(serpiente.getCuadrados()[0]);
+
+
+        if (tiempoDesdeUltimoEngorde > intervaloDeTiempoEngorde){
+            tiempoDesdeUltimoEngorde=0;
+            serpiente.engordaSerpiente(iDireccion);
+        }
+
         if (Gdx.input.justTouched()) {
             //Si entramos aquí es que se ha tocado/clicado la pantalla entre el anterior "render" y este
             iPosXClicked = Gdx.input.getX();
             iPosYClicked = Gdx.input.getY();
 
-            if (iDireccion==0 || iDireccion ==1) {
-                if (iPosXClicked<serpiente.getXPlayer()) iDireccion=2; //Ibamos arriba o abajo, ahora a la izquierda
-                else iDireccion=3; //Han tocado por la derecha...
+            if (iDireccion==Direccion.ARRIBA || iDireccion == Direccion.ABAJO) {
+                if (iPosXClicked<serpiente.getXPlayer()) iDireccion=Direccion.IZQUIERDA; //Ibamos arriba o abajo, ahora a la izquierda
+                else iDireccion=Direccion.DERECHA; //Han tocado por la derecha...
             } else {
-                if (Gdx.graphics.getHeight()-iPosYClicked<serpiente.getYPlayer()) iDireccion=0; //Ibamos izq o derecha, ahora abajo
-                else iDireccion=1;  //vamos para arriba
+                if (Gdx.graphics.getHeight()-iPosYClicked<serpiente.getYPlayer()) iDireccion=Direccion.ABAJO; //Ibamos izq o derecha, ahora abajo
+                else iDireccion=Direccion.ARRIBA;  //vamos para arriba
             }
         }
+
 
         //------------------------------
         //Simulación del mundo
         //------------------------------
         //Dependiendo de la dirección, tenemos que actualizar las posiciones del jugador.
-        if (!bGanamos) {
+        if (!bGanamos && tiempoDesdeUltimoMovimiento >= intervaloDeTiempoMovimiento) {
+            tiempoDesdeUltimoMovimiento = 0;
             switch (iDireccion) {
-                case 0: //arriba
+                case ARRIBA: //arriba
                     serpiente.setYPlayer(serpiente.getYPlayer() + fVelPlayer);
                     //fPosYPlayer+=fVelPlayer;
                     break;
-                case 1: //abajo
+                case ABAJO: //abajo
                     serpiente.setYPlayer(serpiente.getYPlayer() - fVelPlayer);
                     //fPosYPlayer-=fVelPlayer;
                     break;
-                case 2: //izquierda
+                case IZQUIERDA: //izquierda
                     serpiente.setXPlayer(serpiente.getXPlayer() - fVelPlayer);
                     //fPosXPlayer-=fVelPlayer;
                     break;
-                case 3:
+                case DERECHA:
                     serpiente.setXPlayer(serpiente.getXPlayer() + fVelPlayer);
                    //fPosXPlayer+=fVelPlayer;
                     break;

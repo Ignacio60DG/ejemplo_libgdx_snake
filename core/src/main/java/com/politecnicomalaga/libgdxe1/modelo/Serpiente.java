@@ -2,6 +2,7 @@ package com.politecnicomalaga.libgdxe1.modelo;
 
 import com.badlogic.gdx.graphics.Texture;
 
+
 public class Serpiente {
     // Hacer: Informar esto desde el constructor
     private float ladoCuadradoSerpiente;
@@ -24,11 +25,13 @@ public class Serpiente {
         this.player = player;
     }
 
+
+
     // Propiedaes pra hacer get y set de la posicíon X y la Y
 
     private void addNuevoCuadrado(float x, float y) {
         Cuadrado nuevoCuadrado = new Cuadrado(x, y);
-        Cuadrado[] nuevoArrayCuadrados = new Cuadrado[cuadrados.length];
+            Cuadrado[] nuevoArrayCuadrados = new Cuadrado[cuadrados.length];
 
         // Copiamos el array original
         // Desde la posición 0 hasta la penultima (la ultima celda la descartamos)ç
@@ -36,6 +39,26 @@ public class Serpiente {
         System.arraycopy(cuadrados ,0, nuevoArrayCuadrados, 1, cuadrados.length-1);
         nuevoArrayCuadrados[0] = nuevoCuadrado;
         this.cuadrados = nuevoArrayCuadrados;
+    }
+
+    public void engordaSerpiente(Direccion direccion) {
+        Cuadrado[] cuadradosEngordado = new Cuadrado[cuadrados.length+1];
+        //Copiar las cosas del valoresEntrada en valoresSalida
+        System.arraycopy(cuadrados, 0, cuadradosEngordado, 0, cuadrados.length);
+
+        Cuadrado cuadradoAnterior = cuadrados[cuadrados.length -1];
+        cuadradosEngordado[cuadradosEngordado.length -1] = new Cuadrado(cuadradoAnterior.getX() - this.ladoCuadradoSerpiente, cuadradoAnterior.getY());
+
+        cuadrados = cuadradosEngordado;
+    }
+
+    public boolean buscaCuadrado(Cuadrado cuadrado){
+        for (int i=1 ; i<cuadrados.length ; i++){
+            if (cuadrado.getX() == cuadrados[i].getX() && cuadrado.getY() == cuadrados[i].getY()){
+                return true;
+            }
+        }
+        return false;
     }
 
     public void setXPlayer(float xPlayer){
